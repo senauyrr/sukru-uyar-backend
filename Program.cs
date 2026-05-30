@@ -4,8 +4,7 @@ using SukruUyarBackend.Data;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
-// 🔑 İŞTE EKSİK OLAN SİHİRLİ BAĞLANTI BURASI:
-// appsettings.json içindeki DefaultConnection'ı okuyup SQLite'a bağlıyoruz
+// 🔑 appsettings.json içindeki DefaultConnection'ı okuyup SQLite'a bağlıyoruz
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -16,11 +15,13 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 app.UseCors();
 
-if (app.Environment.IsDevelopment())
+// 🚀 SWAGGER AYARI: if şartını kaldırdık, böylece Render'da da aslanlar gibi açılacak!
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SukruUyar API v1");
+    c.RoutePrefix = string.Empty; // Sonuna /swagger yazmana gerek kalmadan direkt ana linkte açılacak!
+});
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
